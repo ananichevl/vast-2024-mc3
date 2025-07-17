@@ -5,7 +5,6 @@ export const EntityTreemap = ({ data }) => {
     const ref = useRef();
 
     useEffect(() => {
-        // Convert Map to array: [{ type, count }]
         const typeCounts = Array.from(data, ([type, count]) => ({ type, count }));
 
         const grouped = {
@@ -21,7 +20,6 @@ export const EntityTreemap = ({ data }) => {
             ]
         };
 
-        // Build hierarchy
         const root = d3
             .hierarchy(grouped)
             .sum(d => Math.sqrt(d.count || 0))
@@ -47,13 +45,12 @@ export const EntityTreemap = ({ data }) => {
             if (type === "Entity.Organization.NewsCompany") return "#cb523c";
             if (type === "Entity.Organization.NGO") return "#c73900";
 
-            return "#bab0ab"; // fallback
+            return "#bab0ab";
         };
 
         const svg = d3.select(ref.current);
         const width = 500, height = 350;
 
-        // Clear old content
         svg.selectAll("*").remove();
         svg.attr("width", width).attr("height", height);
 
@@ -78,7 +75,6 @@ export const EntityTreemap = ({ data }) => {
             .attr("fill", d => getNodeColor(d.data.type))
             .attr("stroke", "white");
 
-        // Only show text if cell is large enough
         cell
             .append("text")
             .attr("x", 5)
@@ -97,7 +93,6 @@ export const EntityTreemap = ({ data }) => {
             .attr("font-size", "12px")
             .style("display", d => (d.x1 - d.x0 > 100 && d.y1 - d.y0 > 30 ? "block" : "none"));
 
-        // Tooltip for all cells
         cell.append("title").text(d =>
             d.data.type
                 ? `${d.data.type}\n${d.data.count} nodes`

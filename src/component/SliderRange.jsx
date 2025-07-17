@@ -22,12 +22,9 @@ export const RevenueFilterGraph = ({nodes, width = 300, height = 600 ,setSelecte
         const minRevenueActual = d3.min(nodes, d => d.revenue);
         const maxRevenueActual = d3.max(nodes, d => d.revenue);
 
-        // Define a small epsilon value for log scale if min revenue is 0
-        const epsilon = minRevenueActual === 0 ? 1 : minRevenueActual; // Use 1 if 0 is present, otherwise actual min
-
-        // 1. Scales for the histogram (Logarithmic X Scale)
-        const x = d3.scaleLog() // Use d3.scaleLog()
-            .domain([epsilon, maxRevenueActual]) // Domain must be positive
+        const epsilon = minRevenueActual === 0 ? 1 : minRevenueActual;
+        const x = d3.scaleLog()
+            .domain([epsilon, maxRevenueActual])
             .range([0, miniChartWidth]);
 
         const y = d3.scaleLinear()
@@ -46,19 +43,19 @@ export const RevenueFilterGraph = ({nodes, width = 300, height = 600 ,setSelecte
             .thresholds(thresholds);
 
 
-        const binnedNodes = nodes.map(d => ({ // Map nodes for binning, handling zero
+        const binnedNodes = nodes.map(d => ({
             ...d,
             binnableRevenue: d.revenue === 0 ? epsilon : d.revenue
         }));
         const bins = histogram(binnedNodes);
 
-        // Filter out empty bins that might occur with a log scale and sparse data
+
         const nonZeroBins = bins.filter(d => d.length > 0);
 
-        // Update Y scale domain based on bin counts
+
         y.domain([0, d3.max(nonZeroBins, d => d.length)]);
 
-        // 3. Draw bars
+
         g.selectAll("rect")
             .data(nonZeroBins)
             .join("rect")
@@ -69,38 +66,34 @@ export const RevenueFilterGraph = ({nodes, width = 300, height = 600 ,setSelecte
             .attr("fill", "steelblue")
             .attr("opacity", 0.7);
 
-        // 4. Add X axis
+
         g.append("g")
             .attr("transform", `translate(0,${miniChartHeight})`)
             .call(d3.axisBottom(x)
-                .ticks(8, d3.format(".1s")) // Use .1s for significant figures and SI prefix
+                .ticks(8, d3.format(".1s"))
                 .tickFormat(d => {
-                    // Custom format to show original 0, then large numbers with Suffix
+
                     if (d === epsilon && minRevenueActual === 0) return "$0";
                     return d3.format(".2s")(d);
                 })
             );
-
-        // Add Y axis (optional, but good for context)
         g.append("g")
             .call(d3.axisLeft(y).ticks(3));
 
-        // Add X axis label
         g.append("text")
             .attr("transform", `translate(${miniChartWidth / 2}, ${miniChartHeight + miniChartMargin.bottom - 5})`)
             .style("text-anchor", "middle")
             .text("Revenue");
 
-        // 5. Implement the Brush
         const brush = d3.brushX()
             .extent([[0, 0], [miniChartWidth, miniChartHeight]])
-            .on("end", brushed); // `end` event is good for filtering after selection
+            .on("end", brushed);
 
         brushRef.current = g.append("g")
             .attr("class", "brush")
             .call(brush);
 
-        // Set initial brush selection to cover the entire range
+
         brushRef.current.call(brush.move, x.range());
 
         function brushed(event) {
@@ -109,16 +102,16 @@ export const RevenueFilterGraph = ({nodes, width = 300, height = 600 ,setSelecte
                 const [x0, x1] = selection.map(x.invert);
                 setSelectedRevenueRange([x0, x1]);
             } else {
-                setSelectedRevenueRange(null); // No selection, show all
+                setSelectedRevenueRange(null);
             }
         }
 
     }, [nodes, width, miniChartWidth, miniChartHeight, miniChartMargin.left, miniChartMargin.bottom]);
 
-    // Effect to filter main graph nodes based on selected revenue range
+
     useEffect(() => {
         if (!selectedRevenueRange) {
-            setFilteredGraphNodes(nodes); // If no selection, show all
+            setFilteredGraphNodes(nodes);
         } else {
             const [minRevenue, maxRevenue] = selectedRevenueRange;
             const newFilteredNodes = nodes.filter(node =>
@@ -138,7 +131,6 @@ export const RevenueFilterGraph = ({nodes, width = 300, height = 600 ,setSelecte
                     height={miniChartHeight + miniChartMargin.top + miniChartMargin.bottom}
                     style={{ border: '1px solid #ddd', backgroundColor: '#f9f9f9' }}
                 >
-                    {/* Histogram and Brush will be rendered here by D3 */}
                 </svg>
                 {selectedRevenueRange && (
                     <div style={{ marginTop: '10px', fontSize: '0.9em', display: 'flex'}}>

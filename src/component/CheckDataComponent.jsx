@@ -24,12 +24,10 @@ export const CheckDataComponent = ({data, subgraphs, title}) => {
         const childMap = new Map();
         const parentMap = new Map();
 
-        // Step 1: Map all nodes by ID
         nodes.forEach(node => {
             idToNode.set(node.id, { ...node, children: [] });
         });
 
-        // Step 2: Build child and parent relationships
         links.forEach(link => {
             const source = link.source;
             const target = link.target;
@@ -106,7 +104,6 @@ export const CheckDataComponent = ({data, subgraphs, title}) => {
             }
         }
 
-        // Extract final graph
         const subNodes = [...visitedNodes].map(id => nodeMap.get(id));
         const subLinks = [...visitedLinks];
 
@@ -120,10 +117,8 @@ export const CheckDataComponent = ({data, subgraphs, title}) => {
         for (const node of nodes) {
             if (allVisited.has(node.id)) continue;
 
-            // Build the full graph from this node
             const { nodes: subNodes, links: subLinks } = buildFullGraph(node.id, nodes, links);
 
-            // Add the nodes to the global visited set
             subNodes.forEach(n => allVisited.add(n.id));
 
             subgraphs.push({ nodes: subNodes, links: subLinks });
@@ -139,7 +134,6 @@ export const CheckDataComponent = ({data, subgraphs, title}) => {
 
     if (data && data.nodes) {
         for (const node of data.nodes) {
-            // Count map fields
             for (const key of Object.keys(maps)) {
                 if (key === 'linkType' || key === 'linkSource' || key === 'linkTarget') {
                     continue;
@@ -148,7 +142,6 @@ export const CheckDataComponent = ({data, subgraphs, title}) => {
                 maps[key].set(value, (maps[key].get(value) || 0) + 1);
             }
 
-            // Track min and max revenue
             const revenue = node.revenue;
             if (typeof revenue === 'number' && !isNaN(revenue)) {
                 if (revenue < minRevenue) minRevenue = revenue;

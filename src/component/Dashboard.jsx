@@ -30,7 +30,6 @@ export const Dashboard = ({graph, subgraphs, countries}) => {
                     return revenue >= minRevenue && revenue <= maxRevenue && (!searchTerm || node.id.toLowerCase().includes(searchTerm.toLowerCase())) && (selectedCountries.size === 0 || selectedCountries.has(node.country));
                 });
 
-                // Remove links not connected to filtered nodes
                 const validNodeIds = new Set(nodes.map(n => n.id));
                 links = links.filter(link =>
                     validNodeIds.has(link.source) && validNodeIds.has(link.target)
@@ -51,7 +50,6 @@ export const Dashboard = ({graph, subgraphs, countries}) => {
             }
 
             for (const node of nodes) {
-                // Assuming node has a revenue field (number), otherwise default to 0
                 const revenue = parseFloat(node.revenue) || 0;
                 totalRevenue += revenue;
 
@@ -86,7 +84,6 @@ export const Dashboard = ({graph, subgraphs, countries}) => {
             });
         }
 
-        // Sort Map by countNodes descending
         return new Map([...resultMap.entries()].sort((a, b) => b[1].countNodes - a[1].countNodes));
     }
 
@@ -146,7 +143,6 @@ export const Dashboard = ({graph, subgraphs, countries}) => {
         const visitedNodeIds = new Set();
         const collectedLinks = new Set();
 
-        // Initialize frontier with selected node
         let currentLevelNodeIds = new Set([selectedId]);
         visitedNodeIds.add(selectedId);
 
@@ -164,7 +160,6 @@ export const Dashboard = ({graph, subgraphs, countries}) => {
                 }
             });
 
-            // Add current level nodes to visited
             for (const id of nextLevelNodeIds) {
                 visitedNodeIds.add(id);
             }
@@ -172,7 +167,6 @@ export const Dashboard = ({graph, subgraphs, countries}) => {
             currentLevelNodeIds = nextLevelNodeIds;
         }
 
-        // Collect nodes based on visited IDs
         const nodes = Array.from(visitedNodeIds).map(id => {
             const node = nodesMap.get(id);
             return {
@@ -182,7 +176,6 @@ export const Dashboard = ({graph, subgraphs, countries}) => {
             };
         });
 
-        // Convert Set to array
         const links = Array.from(collectedLinks);
 
         return { nodes, links };

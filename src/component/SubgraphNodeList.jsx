@@ -28,7 +28,6 @@ export const SubgraphNodeList = ({ subgraph,
 
             const { nodes, links } = subgraph;
 
-            // Count links per node
             const linkMap = {};
 
             links.forEach(({ source, target }) => {
@@ -65,7 +64,6 @@ export const SubgraphNodeList = ({ subgraph,
         return filtered;
     }, [nodesWithLinkCount, filter]);
 
-    // Sorting helper
     const sortedNodes = useMemo(() => {
         const sorted = [...filteredNodes];
         sorted.sort((a, b) => {
@@ -89,21 +87,18 @@ export const SubgraphNodeList = ({ subgraph,
         return sorted;
     }, [filteredNodes, orderBy, order]);
 
-    // Pagination slice
     const paginatedNodes = useMemo(() => {
         const start = page * rowsPerPage;
         return sortedNodes.slice(start, start + rowsPerPage);
     }, [sortedNodes, page, rowsPerPage]);
 
-    // Handlers
     const handleFilterChange = (_, newFilter) => {
         if (newFilter !== null) setFilter(newFilter);
-        setPage(0); // Reset page on filter change
+        setPage(0);
     };
 
     const handleSortChange = (field) => {
         if (orderBy === field) {
-            // Toggle asc/desc
             setOrder(order === "asc" ? "desc" : "asc");
         } else {
             setOrderBy(field);

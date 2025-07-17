@@ -136,7 +136,6 @@ export const ForceGraph = ({ graphData, width = 700, height = 600, depth, setDep
         `).join("");
     }
 
-    // Effect for updating D3 visualization when data changes
     useEffect(() => {
         const simulation = simulationRef.current;
         if (!simulation) return;
@@ -196,7 +195,6 @@ export const ForceGraph = ({ graphData, width = 700, height = 600, depth, setDep
 
         link.merge(newLink);
 
-        // Update nodes
         const node = nodeGroup.selectAll(".node")
             .data(filteredNodes, d => d.id);
 
@@ -227,7 +225,6 @@ export const ForceGraph = ({ graphData, width = 700, height = 600, depth, setDep
             });
         ;;
 
-// Tertiary color palette
         const originalColor = (d) => {
             if (d.type === "Entity.Organization.Company") return "#e2583e";
             if (d.type === "Entity.Organization.FishingCompany") return "#f28074";
@@ -299,7 +296,6 @@ export const ForceGraph = ({ graphData, width = 700, height = 600, depth, setDep
 
     }, [filteredNodes, filteredLinks, dragstarted, dragged, dragended, currentDate]);
 
-    // Effect for controlling playback (setInterval)
     useEffect(() => {
         let playInterval;
         if (isPlaying) {
@@ -309,13 +305,12 @@ export const ForceGraph = ({ graphData, width = 700, height = 600, depth, setDep
                     let currentMillis = prevDate.getTime();
 
                     if (currentMillis < maxMillis) {
-                        // Increment at a reasonable pace
                         currentMillis += (maxMillis - minDate.getTime()) / 200;
-                        if (currentMillis > maxMillis) currentMillis = maxMillis; // Cap at max
+                        if (currentMillis > maxMillis) currentMillis = maxMillis;
                         return new Date(currentMillis);
                     } else {
-                        setIsPlaying(false); // Stop playing when end is reached
-                        return prevDate; // Keep the date at max
+                        setIsPlaying(false);
+                        return prevDate;
                     }
                 });
             }, 100);
@@ -323,7 +318,7 @@ export const ForceGraph = ({ graphData, width = 700, height = 600, depth, setDep
             clearInterval(playInterval);
         }
 
-        return () => clearInterval(playInterval); // Cleanup on unmount or when isPlaying changes
+        return () => clearInterval(playInterval);
     }, [isPlaying, minDate, maxDate]);
 
     useEffect(() => {
@@ -332,7 +327,7 @@ export const ForceGraph = ({ graphData, width = 700, height = 600, depth, setDep
 
 
     const handleSliderChange = (event) => {
-        setIsPlaying(false); // Pause playback when slider is manually moved
+        setIsPlaying(false);
         setCurrentDate(new Date(+event.target.value));
     };
 
@@ -381,10 +376,8 @@ export const ForceGraph = ({ graphData, width = 700, height = 600, depth, setDep
             </div>
 
             <svg ref={svgRef} width={width} height={height} style={{ border: '1px solid #ccc', backgroundColor: '#fff', marginTop: '70px' }}>
-                {/* D3 will draw elements directly into this SVG */}
             </svg>
 
-            {/* Basic styles for the D3 elements */}
             <style jsx>{`
                 .node circle {
                     stroke: #fff;
